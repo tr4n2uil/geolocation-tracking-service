@@ -24,7 +24,6 @@ var initHandlers = function(db){
   server.handlers['history'] = function(request, response, url){
     var timestamp_start = parseInt(url.query.timestamp_start);
     var timestamp_end = parseInt(url.query.timestamp_end);
-    console.log("timestamp", timestamp_start, timestamp_end)
     if(isNaN(timestamp_start) || isNaN(timestamp_end))
       return server.sendResponse(response, "Invalid timestamp");
 
