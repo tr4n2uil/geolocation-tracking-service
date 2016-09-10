@@ -82,8 +82,8 @@ var addTracking = function(device, timestamp, latitude, longitude, cb){
   });
 }
 
-var getHistory = function(device, start, end, type, cb){
-  redisClient.zrangebyscore(["geo_tracking_"+device, start, end, "WITHSCORES"], function(err, reply){
+var getHistory = function(device, start, end, type, page, cb){
+  redisClient.zrangebyscore(["geo_tracking_"+device, start, end, "WITHSCORES", "LIMIT", page*constants.historyLimit, constants.historyLimit], function(err, reply){
     if(err) return cb(err);
 
     var data = [];
@@ -119,7 +119,7 @@ handlers['track'] = function(request, response, url){
 
 // history
 handlers['history'] = function(request, response, url){
-  getHistory(url.query.device_id, url.query.timestamp_start, url.query.timestamp_end, url.query.type, function(err, data){
+  getHistory(url.query.device_id, url.query.timestamp_start, url.query.timestamp_end, url.query.type, url.query.page || 0, function(err, data){
     sendResponse(response, err, data);
   })
 };
