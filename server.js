@@ -44,6 +44,6 @@ exports.instance = http.createServer(function(req, res) {
     exports.handlers[key](req, res, url);
   }
   else {
-    errorResponse(res, "Invalid URL");
+    exports.errorResponse(res, "Invalid URL");
   }
 });
