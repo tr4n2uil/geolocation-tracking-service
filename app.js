@@ -42,4 +42,3 @@ geolocation.instance.init({load:{admin1: true, admin2: false, admin3And4: false,
   });
 });
 
-
