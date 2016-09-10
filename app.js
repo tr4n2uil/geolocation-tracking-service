@@ -5,6 +5,12 @@ var constants = require('./conf.json'),
     redisEngine = require('./engines/redis.js'),
     mongoEngine = require('./engines/mongo.js');
 
+// ===== GLOBAL EXCEPTION =====
+
+process.on('uncaughtException', function(err){
+  log.logger("Global Exception in process:" + err.toString());
+});
+
 // ===== HANDLERS =====
 
 var initHandlers = function(db){
