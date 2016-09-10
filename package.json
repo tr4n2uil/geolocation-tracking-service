@@ -4,7 +4,7 @@
   "readme": "Geolocation Tracking Service",
   "description": "Track and search history of the locations of your devices",
   "scripts": {
-    "start": "node server.js",
+    "start": "node app.js",
     "test": ""
   },
   "repository": {
