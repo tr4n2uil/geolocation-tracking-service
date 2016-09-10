@@ -10,7 +10,13 @@ var constants = require('./conf.json'),
 var initHandlers = function(db){
   // track
   server.handlers['track'] = function(request, response, url){
-    mongoEngine.addTracking(db, url.query.device_id, url.query.timestamp, url.query.latitude, url.query.longitude, function(err){
+    try {
+      var timestamp = parseInt(url.query.timestamp);
+    } catch(e) {
+      return server.sendResponse(response, "Invalid timestamp");
+    }
+
+    mongoEngine.addTracking(db, url.query.device_id, timestamp, url.query.latitude, url.query.longitude, function(err){
     // redisEngine.addTracking(url.query.device_id, url.query.timestamp, url.query.latitude, url.query.longitude, function(err){
       server.sendResponse(response, err);
     })
@@ -18,7 +24,15 @@ var initHandlers = function(db){
 
   // history
   server.handlers['history'] = function(request, response, url){
-    mongoEngine.getHistory(db, url.query.device_id, url.query.timestamp_start, url.query.timestamp_end, url.query.type, url.query.page || 0, function(err, data){
+    var timestamp_start, timestamp_end;
+    try {
+      timestamp_start = parseInt(url.query.timestamp_start);
+      timestamp_end = parseInt(url.query.timestamp_end);
+    } catch(e) {
+      return server.sendResponse(response, "Invalid timestamp");
+    }
+
+    mongoEngine.getHistory(db, url.query.device_id, timestamp_start, timestamp_end, url.query.type, url.query.page || 0, function(err, data){
     // redisEngine.getHistory(url.query.device_id, url.query.timestamp_start, url.query.timestamp_end, url.query.type, url.query.page || 0, function(err, data){
       server.sendResponse(response, err, data);
     })
