@@ -42,7 +42,7 @@ exports.getHistory = function(db, device, start, end, type, page, cb){
   getCollection(db, device, function(err, col){
     if(err) return cb(err);
 
-    col.find({}).skip(page*constants.historyLimit).limit(constants.historyLimit).toArray(function(err, reply) {
+    col.find({"timestamp": {"$gte": start, "$lt": end}}).skip(page*constants.historyLimit).limit(constants.historyLimit).toArray(function(err, reply) {
       if(err) return cb(err);
 
       var data = [];
