@@ -4,3 +4,18 @@ Vibhaj Rajan
 vibhaj8@gmail.com
 
 
+
+# Demo
+
+Mumbai
+curl -v "http://localhost:8080/track/?latitude=19.07&longitude=72.87&device_id=2sadgs12las214nds91&timestamp=123125123175"
+
+Delhi
+curl -v "http://localhost:8080/track/?latitude=28.70&longitude=77.10&device_id=2sadgs12las214nds91&timestamp=123125123185"
+
+Bangalore
+curl -v "http://localhost:8080/track/?latitude=12.97&longitude=77.59&device_id=2sadgs12las214nds91&timestamp=123125123195"
+
+
+curl -s "http://localhost:8080/history/?device_id=2sadgs12las214nds91&timestamp_start=123125123150&timestamp_end=123125123198&type=geolocation"
+

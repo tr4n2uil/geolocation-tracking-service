@@ -2,5 +2,8 @@
   "port": 8080,
   "redisHost": "localhost",
   "redisPort": 6379,
+  "mongoHost": "localhost",
+  "mongoPort": 27017,
+  "mongoDB": "geotrack",
   "historyLimit": 2
 }
