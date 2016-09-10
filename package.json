@@ -1,0 +1,18 @@
+{
+  "name": "geolocation-tracking-service",
+  "version": "0.1.0",
+  "readme": "Geolocation Tracking Service",
+  "description": "Track and search history of the locations of your devices",
+  "scripts": {
+    "start": "node server.js",
+    "test": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tr4n2uil/geo-location-tracker.git"
+  },
+  "dependencies": {
+    "redis": "0.12.1"
+  },
+  "license": "MIT"
+}
