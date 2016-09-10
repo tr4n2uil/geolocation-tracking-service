@@ -12,7 +12,8 @@
     "url": "https://github.com/tr4n2uil/geo-location-tracker.git"
   },
   "dependencies": {
-    "redis": "0.12.1"
+    "redis": "0.12.1",
+    "local-reverse-geocoder": "0.2.1"
   },
   "license": "MIT"
 }
