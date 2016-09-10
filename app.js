@@ -37,11 +37,15 @@ var initHandlers = function(db){
   // track
   server.handlers['track'] = function(request, response, url){
     var timestamp = validateInteger(url.query.timestamp, response, "timestamp");
-    var latitude = validateFloat(url.query.latitude, response, "latitude");
-    var longitude = validateFloat(url.query.longitude, response, "longitude");
-    log.logger("timestamp: "+timestamp+" latitude: "+latitude+" longitude: "+longitude);
-    if(timestamp === false || latitude === false || longitude === false) return;
+    if(timestamp === false) return;
 
+    var latitude = validateFloat(url.query.latitude, response, "latitude");
+    if(latitude === false) return;
+
+    var longitude = validateFloat(url.query.longitude, response, "longitude");
+    if(longitude === false) return;
+
+    log.logger("timestamp: "+timestamp+" latitude: "+latitude+" longitude: "+longitude);
     mongoEngine.addTracking(db, url.query.device_id, timestamp, latitude, longitude, function(err){
     // redisEngine.addTracking(url.query.device_id, url.query.timestamp, url.query.latitude, url.query.longitude, function(err){
       server.sendResponse(response, err);
@@ -51,15 +55,19 @@ var initHandlers = function(db){
   // history
   server.handlers['history'] = function(request, response, url){
     var timestamp_start = validateInteger(url.query.timestamp_start, response, "timestamp_start");
+    if(timestamp_start === false) return;
+
     var timestamp_end = validateInteger(url.query.timestamp_end, response, "timestamp_end");
+    if(timestamp_end === false) return;
+
     var page = url.query.page || 0;
     page = validateInteger(page, response, "page");
+    if(page === false) return;
 
-    log.logger("timestamp_start: "+timestamp_start+" timestamp_end: "+timestamp_end+" page: "+page+" type: "+url.query.type);
-    if(timestamp_start === false || timestamp_end === false || page === false) return;
     if(["latlong", "geolocation"].indexOf(url.query.type) == -1)
       return server.sendResponse(response, "Invalid type");
 
+    log.logger("timestamp_start: "+timestamp_start+" timestamp_end: "+timestamp_end+" page: "+page+" type: "+url.query.type);
     mongoEngine.getHistory(db, url.query.device_id, timestamp_start, timestamp_end, url.query.type, page, function(err, data){
     // redisEngine.getHistory(url.query.device_id, url.query.timestamp_start, url.query.timestamp_end, url.query.type, url.query.page || 0, function(err, data){
       server.sendResponse(response, err, data);
