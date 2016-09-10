@@ -39,7 +39,7 @@ exports.instance = http.createServer(function(req, res) {
   var url = nodeurl.parse(req.url, true);
   var key = url.pathname.replace(/^\/|\/$/g, '');
 
-  log.logger("Request for: "+ key);
+  log.logger("Request for: "+ req.url);
   if(exports.handlers[key]){
     exports.handlers[key](req, res, url);
   }

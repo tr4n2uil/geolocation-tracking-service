@@ -15,8 +15,8 @@ process.on('uncaughtException', function(err){
 
 var validateInteger = function(value, response, name){
   var parsedValue = parseInt(value);
-  if(isNaN(parsedValue) || parsedValue <= 0){
-    server.sendResponse(response, 400, "Invalid "+name);
+  if(isNaN(parsedValue) || parsedValue < 0){
+    server.sendResponse(response, "Invalid "+name);
     return false;
   }
   return parsedValue;
@@ -24,17 +24,11 @@ var validateInteger = function(value, response, name){
 
 var validateFloat = function(value, response, name){
   var parsedValue = parseFloat(value);
-  if(isNaN(parsedValue) || parsedValue <= 0){
-    server.sendResponse(response, 400, "Invalid "+name);
+  if(isNaN(parsedValue) || parsedValue < 0){
+    server.sendResponse(response, "Invalid "+name);
     return false;
   }
   return parsedValue;
-}
-
-var validateInteger = function(value, response, name){
-  var parsedValue = parseInt(value);
-  if(isNaN(parsedValue))
-    return server.sendResponse(response, 400, "Invalid "+name);
 }
 
 // ===== HANDLERS =====
@@ -42,11 +36,13 @@ var validateInteger = function(value, response, name){
 var initHandlers = function(db){
   // track
   server.handlers['track'] = function(request, response, url){
-    if(!validateInteger(url.query.timestamp, response, "timestamp")) return;
-    if(!validateFloat(url.query.latitude, response, "latitude")) return;
-    if(!validateFloat(url.query.longitude, response, "longitude")) return;
+    var timestamp = validateInteger(url.query.timestamp, response, "timestamp");
+    var latitude = validateFloat(url.query.latitude, response, "latitude");
+    var longitude = validateFloat(url.query.longitude, response, "longitude");
+    log.logger("timestamp: "+timestamp+" latitude: "+latitude+" longitude: "+longitude);
+    if(timestamp === false || latitude === false || longitude === false) return;
 
-    mongoEngine.addTracking(db, url.query.device_id, timestamp, url.query.latitude, url.query.longitude, function(err){
+    mongoEngine.addTracking(db, url.query.device_id, timestamp, latitude, longitude, function(err){
     // redisEngine.addTracking(url.query.device_id, url.query.timestamp, url.query.latitude, url.query.longitude, function(err){
       server.sendResponse(response, err);
     })
@@ -54,13 +50,17 @@ var initHandlers = function(db){
 
   // history
   server.handlers['history'] = function(request, response, url){
-    if(!validateInteger(url.query.timestamp_start, response, "timestamp_start")) return;
-    if(!validateInteger(url.query.timestamp_end, response, "timestamp_end")) return;
-    if(url.query.page && !validateInteger(url.query.page, response, "page")) return;
-    if(["latlong", "geolocation"].indexOf(url.query.type) == -1)
-      return server.sendResponse(response, 400, "Invalid type");
+    var timestamp_start = validateInteger(url.query.timestamp_start, response, "timestamp_start");
+    var timestamp_end = validateInteger(url.query.timestamp_end, response, "timestamp_end");
+    var page = url.query.page || 0;
+    page = validateInteger(page, response, "page");
 
-    mongoEngine.getHistory(db, url.query.device_id, timestamp_start, timestamp_end, url.query.type, url.query.page || 0, function(err, data){
+    log.logger("timestamp_start: "+timestamp_start+" timestamp_end: "+timestamp_end+" page: "+page+" type: "+url.query.type);
+    if(timestamp_start === false || timestamp_end === false || page === false) return;
+    if(["latlong", "geolocation"].indexOf(url.query.type) == -1)
+      return server.sendResponse(response, "Invalid type");
+
+    mongoEngine.getHistory(db, url.query.device_id, timestamp_start, timestamp_end, url.query.type, page, function(err, data){
     // redisEngine.getHistory(url.query.device_id, url.query.timestamp_start, url.query.timestamp_end, url.query.type, url.query.page || 0, function(err, data){
       server.sendResponse(response, err, data);
     })
