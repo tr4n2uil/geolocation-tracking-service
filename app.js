@@ -11,14 +11,40 @@ process.on('uncaughtException', function(err){
   log.logger("Global Exception in process:" + err.toString());
 });
 
+// ===== VALIDATION =====
+
+var validateInteger = function(value, response, name){
+  var parsedValue = parseInt(value);
+  if(isNaN(parsedValue) || parsedValue <= 0){
+    server.sendResponse(response, 400, "Invalid "+name);
+    return false;
+  }
+  return parsedValue;
+}
+
+var validateFloat = function(value, response, name){
+  var parsedValue = parseFloat(value);
+  if(isNaN(parsedValue) || parsedValue <= 0){
+    server.sendResponse(response, 400, "Invalid "+name);
+    return false;
+  }
+  return parsedValue;
+}
+
+var validateInteger = function(value, response, name){
+  var parsedValue = parseInt(value);
+  if(isNaN(parsedValue))
+    return server.sendResponse(response, 400, "Invalid "+name);
+}
+
 // ===== HANDLERS =====
 
 var initHandlers = function(db){
   // track
   server.handlers['track'] = function(request, response, url){
-    var timestamp = parseInt(url.query.timestamp);
-    if(isNaN(timestamp))
-      return server.sendResponse(response, "Invalid timestamp");
+    if(!validateInteger(url.query.timestamp, response, "timestamp")) return;
+    if(!validateFloat(url.query.latitude, response, "latitude")) return;
+    if(!validateFloat(url.query.longitude, response, "longitude")) return;
 
     mongoEngine.addTracking(db, url.query.device_id, timestamp, url.query.latitude, url.query.longitude, function(err){
     // redisEngine.addTracking(url.query.device_id, url.query.timestamp, url.query.latitude, url.query.longitude, function(err){
@@ -28,10 +54,11 @@ var initHandlers = function(db){
 
   // history
   server.handlers['history'] = function(request, response, url){
-    var timestamp_start = parseInt(url.query.timestamp_start);
-    var timestamp_end = parseInt(url.query.timestamp_end);
-    if(isNaN(timestamp_start) || isNaN(timestamp_end))
-      return server.sendResponse(response, "Invalid timestamp");
+    if(!validateInteger(url.query.timestamp_start, response, "timestamp_start")) return;
+    if(!validateInteger(url.query.timestamp_end, response, "timestamp_end")) return;
+    if(url.query.page && !validateInteger(url.query.page, response, "page")) return;
+    if(["latlong", "geolocation"].indexOf(url.query.type) == -1)
+      return server.sendResponse(response, 400, "Invalid type");
 
     mongoEngine.getHistory(db, url.query.device_id, timestamp_start, timestamp_end, url.query.type, url.query.page || 0, function(err, data){
     // redisEngine.getHistory(url.query.device_id, url.query.timestamp_start, url.query.timestamp_end, url.query.type, url.query.page || 0, function(err, data){

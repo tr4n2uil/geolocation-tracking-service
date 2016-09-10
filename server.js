@@ -17,9 +17,9 @@ exports.successResponse = function(response, data){
   response.end(JSON.stringify(resBody));
 }
 
-exports.errorResponse = function(response, reason){
+exports.errorResponse = function(response, code, reason){
   log.logger("Response: Error - " + util.inspect(reason));
-  response.writeHead(500, {});
+  response.writeHead(code || 400, {});
   response.end(JSON.stringify({
     status: "error",
     reason: util.inspect(reason)
@@ -28,7 +28,7 @@ exports.errorResponse = function(response, reason){
 
 exports.sendResponse = function(response, error, data){
   if(error) 
-    exports.errorResponse(response, error)
+    exports.errorResponse(response, data, error)
   else 
     exports.successResponse(response, data);
 }
@@ -44,6 +44,6 @@ exports.instance = http.createServer(function(req, res) {
     exports.handlers[key](req, res, url);
   }
   else {
-    exports.errorResponse(res, "Invalid URL");
+    exports.errorResponse(res, 400, "Invalid URL");
   }
 });
